@@ -93,8 +93,8 @@ class WarcProxyHandler(warcprox.mitmproxy.MitmProxyHandler):
         if ":" in bucket0:
             b, raw_domain = bucket0.split(":", 1)
             domain = urlcanon.normalize_host(raw_domain).decode("ascii")
-            bucket0 = "{}:{}".format(b, domain)
-            limit_key = "{}/{}/{}".format(bucket0, bucket1, bucket2)
+            bucket0 = f"{b}:{domain}"
+            limit_key = f"{bucket0}/{bucket1}/{bucket2}"
 
         if not bucket0 in buckets:
             return
@@ -214,13 +214,7 @@ class WarcProxyHandler(warcprox.mitmproxy.MitmProxyHandler):
         req, prox_rec_res = warcprox.mitmproxy.MitmProxyHandler._proxy_request(
                 self, extra_response_headers=extra_response_headers)
 
-        content_type = None
-        try:
-            content_type = prox_rec_res.headers.get('content-type')
-        except AttributeError: # py2
-            raw = prox_rec_res.msg.getrawheader('content-type')
-            if raw:
-                content_type = raw.strip()
+        content_type = prox_rec_res.headers.get('content-type')
 
         recorded_url = RecordedUrl(
                 url=self.url, request_data=req,
